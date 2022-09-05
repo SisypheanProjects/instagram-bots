@@ -11,6 +11,14 @@ def print_hi(name):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    print_hi('PyCharm')  
+    exit(0)
+
+import sys
+
+def handler(event, context):
+    print(event)
+    print(context)
+    return 'Hello from AWS Lambda using Python' + sys.version + '!'   
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
