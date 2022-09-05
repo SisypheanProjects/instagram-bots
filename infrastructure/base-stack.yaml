@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Transform: 'AWS::Serverless-2016-10-31'
 Description: Base stack
 
 Resources:
@@ -17,6 +18,61 @@ Resources:
           Value: !Sub ${AWS::StackName}
         - Key: Resource
           Value: S3
+  
+  InstagramBotRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      ImageScanningConfiguration:
+        ScanOnPush: True
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                  "rulePriority": 1,
+                  "description": "Delete untagged images",
+                  "selection": {
+                      "tagStatus": "untagged",
+                      "countType": "imageCountMoreThan",
+                      "countNumber": 2
+                  },
+                  "action": {
+                      "type": "expire"
+                  }
+              }
+            ]
+          }
+      RepositoryName: !Sub ${AWS::StackName}-repo
+      Tags:
+        - Key: Stack
+          Value: !Sub ${AWS::StackName}
+        - Key: Resource
+          Value: ECR
+  
+  InstagramBotServerlessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Architectures: 
+        - x86_64
+      Description: Search for new images and handle them if found.
+      Environment:
+        Variables:
+          testkey: testvalue
+      Events:
+        ScheduleEvent:
+          Properties:
+            Description: Serverless Function trigger mechanism.
+            Enabled: true
+            Name: !Sub ${AWS::StackName}-serverless-function-event-trigger
+            Schedule: 'rate(1 hour)'
+          Type: Schedule
+      FunctionName: !Sub ${AWS::StackName}-serverless-function
+      ImageUri: !Sub ${InstagramBotRepository.RepositoryUri}:latest
+      PackageType: Image
+      Tags:
+        Stack: !Sub ${AWS::StackName}
+        Resource: ECR
+      Timeout: 300
 
   InstagramBotUserGroup:
     Type: AWS::IAM::Group
@@ -56,7 +112,7 @@ Resources:
     UpdateReplacePolicy: Delete
     Properties:
       Description: Access and Secret keys for the InstagramBot.
-      Name: !Sub ${AWS::StackName}-instagram-bot-secret
+      Name: !Sub ${AWS::StackName}-user-secret
       SecretString: !Sub |
         '{
           "USER_NAME":"${InstagramBotUser}",
@@ -71,9 +127,12 @@ Resources:
 
 Outputs:
   InstagramBotUser:
-    Description: The IAM User of the Instagram stack.
+    Description: The IAM User of the Instagram bot stack.
     Value: !Ref InstagramBotUser
   InstagramBotUserCredentials:
     Description: Access and Secret key for the Instagram bot.
     Value: !Ref InstagramBotUserCredentialsSecret
+  InstagramBotRepository:
+    Description: Repository of Instagram bot's Lambda code.
+    Value: !Ref InstagramBotRepository
 
