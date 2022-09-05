@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Base stack
+Resources:
+
+  InstagramBotSharedS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-instagram-bots"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      Tags:
+        - Key: Project
+          Value: instagram-bots
+        - Key: Resource
+          Value: S3
+
+  InstagramBotUserGroup:
+    Type: AWS::IAM::Group
+    Properties: 
+      GroupName: InstagramBots
+      Policies: 
+        - PolicyName: instagram-bots-policy
+          PolicyDocument: 
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:ListBucket"
+                Resource: !Ref InstagramBotSharedS3Bucket
