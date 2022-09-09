@@ -129,4 +129,7 @@ dmypy.json
 .pyre/
 
 # Pycharm
-code/.idea
+app/.idea
+app/.idea/*
+app/config
+"app/.idea/"
