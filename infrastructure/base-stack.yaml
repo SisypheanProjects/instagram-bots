@@ -58,6 +58,7 @@ Resources:
       Environment:
         Variables:
           INSTAGRAM_SECRET_ARN: !Ref InstagramBotVariousSecrets
+          SHARED_S3_BUCKET: !Ref InstagramBotSharedS3Bucket
       Events:
         ScheduleEvent:
           Properties:
