@@ -1,24 +1,26 @@
-# This is a sample Python script.
+import os
+from typing import List
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from Models.Bots.IBot import IBot
+from Models.Bots.NASABot.NASABot import NASABot
 
+try:
+    INSTAGRAM_SECRET_ARN = os.environ["INSTAGRAM_SECRET_ARN"]
+    SHARED_S3_BUCKET = os.environ["SHARED_S3_BUCKET"]
+except KeyError:
+    INSTAGRAM_SECRET_ARN = "<<INPUT>>>>"
+    SHARED_S3_BUCKET = "<<INPUT>>"
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+bots: List[IBot] = [
+    NASABot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET)
+]
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')  
-    exit(0)
-
-import sys
 
 def handler(event, context):
-    print(event)
-    print(context)
-    return 'Hello from AWS Lambda using Python' + sys.version + '!'   
+    # TODO: Each bot might generate it's own config folder. Look into concurrency issues, and parallelize if safe.
+    for bot in bots:
+        bot.run()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+if __name__ == '__main__':
+    handler(None, None)
