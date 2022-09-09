@@ -57,7 +57,8 @@ Resources:
       Description: Search for new images and handle them if found.
       Environment:
         Variables:
-          testkey: testvalue
+          INSTAGRAM_SECRET_ARN: !Ref InstagramBotVariousSecrets
+          SHARED_S3_BUCKET: !Ref InstagramBotSharedS3Bucket
       Events:
         ScheduleEvent:
           Properties:
@@ -76,6 +77,8 @@ Resources:
 
   InstagramBotUserGroup:
     Type: AWS::IAM::Group
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties: 
       GroupName: InstagramBots
       Policies: 
@@ -90,6 +93,8 @@ Resources:
   
   InstagramBotUser:
     Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties: 
       Groups: 
         - !Ref InstagramBotUserGroup
@@ -102,23 +107,39 @@ Resources:
 
   InstagramBotUserAccessKey:
     Type: AWS::IAM::AccessKey
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Status: Active
       UserName: !Ref InstagramBotUser
   
   InstagramBotUserCredentialsSecret:
     Type: AWS::SecretsManager::Secret
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Delete
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Description: Access and Secret keys for the InstagramBot.
-      Name: !Sub ${AWS::StackName}-user-secret
+      Name: !Sub ${AWS::StackName}-user-account-secrets
       SecretString: !Sub |
         '{
           "USER_NAME":"${InstagramBotUser}",
           "ACCESS_KEY":"${InstagramBotUserAccessKey}",
           "SECRET_KEY":"${InstagramBotUserAccessKey.SecretAccessKey}"
         }'
+      Tags:
+        - Key: Stack
+          Value: !Sub ${AWS::StackName}
+        - Key: Resource
+          Value: IAMUser
+  
+  InstagramBotVariousSecrets:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: Various Keys needed by the InstagramBot.
+      Name: !Sub ${AWS::StackName}-user-various-secrets
+      SecretString: '{}'
       Tags:
         - Key: Stack
           Value: !Sub ${AWS::StackName}
@@ -135,4 +156,7 @@ Outputs:
   InstagramBotRepository:
     Description: Repository of Instagram bot's Lambda code.
     Value: !Ref InstagramBotRepository
+  InstagramBotVariousSecrets:
+      Description: Various Keys needed by the InstagramBot.
+      Value: !Ref InstagramBotVariousSecrets
 
