@@ -13,23 +13,27 @@ class IBot:
     __secret: Dict[str, str]
     __s3_bucket: str
     __s3_prefix: str
+    __dynamo_db_table: str
     __insta_graph_api: InstaGraphAPI
     __hashtags: List[str]
 
     def __init__(self,
                  instagram_secret_arn: str,
-                 instagram_user_key: str,
-                 instagram_pass_key: str,
-                 s3_bucket: str,
+                 instagram_user_secret_key: str,
+                 instagram_pass_secret_key: str,
+                 dynamo_db_table: str,
+                 shared_s3_bucket: str,
                  s3_prefix: str,
                  hashtags: List[str]):
 
         self.__secret = SecretsManager.get_secret(instagram_secret_arn)
-        username = self.__secret[instagram_user_key]
-        password = self.__secret[instagram_pass_key]
+        username = self.__secret[instagram_user_secret_key]
+        password = self.__secret[instagram_pass_secret_key]
 
-        self.__s3_bucket = s3_bucket
+        self.__s3_bucket = shared_s3_bucket
         self.__s3_prefix = self.__secret[s3_prefix]
+
+        self.__dynamo_db_table = dynamo_db_table
 
         self.__hashtags = hashtags
 

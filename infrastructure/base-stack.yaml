@@ -81,6 +81,14 @@ Resources:
                 Resource:
                   - !GetAtt InstagramBotSharedS3Bucket.Arn
                   - !Sub ${InstagramBotSharedS3Bucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:UpdateItem"
+                Resource: !GetAtt InstagramBotDynamoDB.Arn
 
   InstagramBotServerlessFunction:
     Type: AWS::Serverless::Function
@@ -92,6 +100,7 @@ Resources:
         Variables:
           INSTAGRAM_SECRET_ARN: !Ref InstagramBotVariousSecrets
           SHARED_S3_BUCKET: !Ref InstagramBotSharedS3Bucket
+          DYNAMO_DB_TABLE: !Ref InstagramBotDynamoDB
       Events:
         ScheduleEvent:
           Properties:
@@ -179,6 +188,33 @@ Resources:
           Value: !Sub ${AWS::StackName}
         - Key: Resource
           Value: IAMUser
+  
+  InstagramBotDynamoDB:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: topic
+          AttributeType: S
+        - AttributeName: file
+          AttributeType: S
+      BillingMode: PROVISIONED
+      KeySchema:
+        - AttributeName: topic
+          KeyType: HASH
+        - AttributeName: file
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableClass: STANDARD
+      TableName: !Sub ${AWS::StackName}-dyanmodb-table
+      Tags:
+        - Key: Stack
+          Value: !Sub ${AWS::StackName}
+        - Key: Resource
+          Value: DynamoDB
 
   GitHubUserGroup:
     Type: AWS::IAM::Group
@@ -262,6 +298,9 @@ Outputs:
   InstagramBotVariousSecrets:
       Description: Various Keys needed by the InstagramBot.
       Value: !Ref InstagramBotVariousSecrets
-  InstagramSharedS3Bucket:
+  InstagramBotSharedS3Bucket:
       Description: Shared S3 bucket used by the InstagramBot.
       Value: !Ref InstagramBotSharedS3Bucket
+  InstagramBotDynamoDBTable:
+      Description: Shared DynamoDB Table used by the InstagramBot.
+      Value: !Ref InstagramBotDynamoDB

@@ -9,15 +9,16 @@ from Models.Picture.Picture import Picture
 class NASABot(IBot):
     __apod_api_key: str
 
-    def __init__(self, instagram_secret_arn: str, shared_s3_bucket: str):
+    def __init__(self, instagram_secret_arn: str, shared_s3_bucket: str, dynamo_db_table: str):
         # TODO: These strings should be in a config file
         super().__init__(
-            instagram_secret_arn,
-            "NASA_INSTAGRAM_USERNAME",
-            "NASA_INSTAGRAM_PASSWORD",
-            shared_s3_bucket,
-            "NASA_S3_PREFIX",
-            ["nasa", "space", "explore"]
+            instagram_secret_arn=instagram_secret_arn,
+            instagram_user_secret_key="NASA_INSTAGRAM_USERNAME",
+            instagram_pass_secret_key="NASA_INSTAGRAM_PASSWORD",
+            dynamo_db_table=dynamo_db_table,
+            shared_s3_bucket=shared_s3_bucket,
+            s3_prefix="NASA_S3_PREFIX",
+            hashtags=["nasa", "space", "explore"]
         )
         self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
 
