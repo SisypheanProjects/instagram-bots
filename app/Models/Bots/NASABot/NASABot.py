@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Union
 
+from APIs import NASA
 from Models.Bots.IBot import IBot
 from Models.Picture.Picture import Picture
-from Utilities.Utilities import get
 
 
 class NASABot(IBot):
@@ -24,9 +24,7 @@ class NASABot(IBot):
         print('NASABot initialized.')
 
     def find_new_pic(self) -> Union[Picture, None]:
-        # Request latest picture from NASA:
-        url = f"https://api.nasa.gov/planetary/apod?api_key={self.__apod_api_key}"
-        photo = get(url)
+        photo = NASA.apod_get(self.__apod_api_key)
 
         url = photo['hdurl']
         if not url:
