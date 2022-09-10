@@ -1,9 +1,6 @@
 from datetime import datetime
 from typing import Union
 
-import requests
-
-from AWS import S3
 from Models.Bots.IBot import IBot
 from Models.Picture.Picture import Picture
 from Utilities.Utilities import get
@@ -23,7 +20,7 @@ class NASABot(IBot):
         )
         self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
 
-    def add_picture_to_s3(self) -> Union[Picture, None]:
+    def find_new_pic(self) -> Union[Picture, None]:
         # Request latest picture from NASA:
         url = f"https://api.nasa.gov/planetary/apod?api_key={self.__apod_api_key}"
         photo = get(url)
@@ -38,21 +35,5 @@ class NASABot(IBot):
         picture = Picture(photo['title'], photo['explanation'], date, url, file)
 
         if self.does_photo_exist(picture):
-            return
-
-        with open(file, 'wb') as out_file:
-            content = requests.get(picture.source, stream=True).content
-            out_file.write(content)
-
-        key = f'{self.s3_prefix}/{picture.title}'
-        extra_args = {
-            'Metadata': {
-                'caption': picture.caption,
-                'date': picture.date.strftime("%m-%d-%Y"),
-                'source': picture.source
-            }
-        }
-        S3.upload_file(bucket=self.s3_bucket, key=key, location=file, extra_args=extra_args)
-
+            return None
         return picture
-

@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 from typing import List
 
@@ -9,6 +10,7 @@ try:
     INSTAGRAM_SECRET_ARN = os.environ["INSTAGRAM_SECRET_ARN"]
     SHARED_S3_BUCKET = os.environ["SHARED_S3_BUCKET"]
 except KeyError:
+    # used for local dev
     INSTAGRAM_SECRET_ARN = CloudFormation.get_stack_output("instagram-bots", "InstagramBotVariousSecrets")
     SHARED_S3_BUCKET = CloudFormation.get_stack_output("instagram-bots", "InstagramSharedS3Bucket")
 
@@ -20,9 +22,15 @@ bots: List[IBot] = [
 def handler(event, context):
     print(event)
     print(context)
-    # TODO: Each bot might generate it's own config folder. Look into concurrency issues, and parallelize if safe.
+
+    processes = []
     for bot in bots:
-        bot.run()
+        process = multiprocessing.Process(target=bot.run)
+        processes.append(process)
+        process.start()
+
+    for process in processes:
+        process.join()
 
 
 if __name__ == '__main__':

@@ -1,13 +1,14 @@
 from abc import abstractmethod
 from typing import Dict, Union
 
+import requests
+
 from AWS import SecretsManager, S3
 from Models.Instagram.Instagram import InstaGraphAPI
 from Models.Picture.Picture import Picture
 
 
 class IBot:
-    # __bot: Bot
     __secret: Dict[str, str]
     __s3_bucket: str
     __s3_prefix: str
@@ -38,6 +39,21 @@ class IBot:
     @property
     def s3_prefix(self) -> str: return self.__s3_prefix
 
+    def add_pic_to_s3(self, picture: Picture) -> None:
+        with open(picture.local, 'wb') as out_file:
+            content = requests.get(picture.source, stream=True).content
+            out_file.write(content)
+
+        key = f'{self.s3_prefix}/{picture.title}'
+        extra_args = {
+            'Metadata': {
+                'caption': picture.caption,
+                'date': picture.date.strftime("%m-%d-%Y"),
+                'source': picture.source
+            }
+        }
+        S3.upload_file(bucket=self.s3_bucket, key=key, location=picture.local, extra_args=extra_args)
+
     def add_pic_to_instagram(self, photo: Picture) -> None:
         caption = f'{photo.title}\n\nSource: {photo.source}\n\n{photo.caption}'
 
@@ -49,11 +65,11 @@ class IBot:
         return S3.does_file_exist(self.s3_bucket, f'{self.s3_prefix}/{picture.title}')
 
     def run(self) -> None:
-        new_pic = self.add_picture_to_s3()
+        new_pic = self.find_new_pic()
         if new_pic is not None:
+            self.add_pic_to_s3(new_pic)
             self.add_pic_to_instagram(new_pic)
-        pass
 
     @abstractmethod
-    def add_picture_to_s3(self) -> Union[Picture, None]:
+    def find_new_pic(self) -> Union[Picture, None]:
         pass
