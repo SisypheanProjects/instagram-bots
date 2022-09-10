@@ -8,7 +8,7 @@ class EarthPicsBot(IImgurBot):
             instagram_secret_arn=instagram_secret_arn,
             shared_s3_bucket=shared_s3_bucket,
             subreddit='EarthPorn',
-            topic='earth-pics',
+            dynamo_db_topic='earth-pics',
             dynamo_db_table=dynamo_db_table,
             instagram_user_secret_key='EARTHPICS_INSTAGRAM_USERNAME',
             instagram_pass_secret_key='EARTHPICS_INSTAGRAM_PASSWORD',
