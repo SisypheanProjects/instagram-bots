@@ -4,6 +4,7 @@ from typing import List
 
 from AWS import CloudFormation
 from Models.Bots.IBot import IBot
+from Models.Bots.ImgurBots.DogPicsBot import DogPicsBot
 from Models.Bots.ImgurBots.EarthPicsBot import EarthPicsBot
 from Models.Bots.NASABot.NASABot import NASABot
 
@@ -19,7 +20,8 @@ except KeyError:
 
 bots: List[IBot] = [
     NASABot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET, DYNAMO_DB_TABLE),
-    EarthPicsBot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET, DYNAMO_DB_TABLE)
+    EarthPicsBot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET, DYNAMO_DB_TABLE),
+    DogPicsBot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET, DYNAMO_DB_TABLE)
 ]
 
 

@@ -13,6 +13,7 @@ from Models.Picture.Picture import Picture
 
 
 class IBot:
+    __username: str
     __secret: Dict[str, str]
     __s3_bucket: str
     __s3_prefix: str
@@ -32,7 +33,7 @@ class IBot:
                  hashtags: List[str]):
 
         self.__secret = SecretsManager.get_secret(instagram_secret_arn)
-        username = self.__secret[instagram_user_secret_key]
+        self.__username = self.__secret[instagram_user_secret_key]
         password = self.__secret[instagram_pass_secret_key]
 
         self.__s3_bucket = shared_s3_bucket
@@ -44,12 +45,12 @@ class IBot:
         self.__hashtags = hashtags
 
         try:
-            self.__insta_graph_api = InstaGraphAPI(username=username, password=password)
+            self.__insta_graph_api = InstaGraphAPI(username=self.__username, password=password)
         except RateLimitError:
-            print(f'Cannot instantiate InstaGraphiAPI for {username} due to RateLimitError.')
+            print(f'Cannot instantiate InstaGraphiAPI for {self.__username} due to RateLimitError.')
             self.__insta_graph_api = None
         except Exception as e:
-            print(f'Cannot instantiate InstaGraphAPI for {username}. Error: {e}')
+            print(f'Cannot instantiate InstaGraphAPI for {self.__username}. Error: {e}')
             self.__insta_graph_api = None
 
     @property
@@ -112,7 +113,7 @@ class IBot:
 
     def run(self) -> None:
         if self.__insta_graph_api is None:
-            print('Cannot start Instagram Service.')
+            print(f'Cannot start Instagram Service for {self.__username}.')
             return
 
         record, new_pic = self.find_new_pic()
