@@ -15,6 +15,7 @@ def list_objects(bucket_name: str, prefix: str) -> List[Dict[str, str]]:
 
 
 def does_file_exist(bucket_name: str, key: str) -> bool:
+    print(f'Searching S3 {bucket_name} Bucket for {key}.')
     try:
         __client.head_object(
             Bucket=bucket_name,
@@ -22,10 +23,11 @@ def does_file_exist(bucket_name: str, key: str) -> bool:
         )
     except ClientError as e:
         if e.response['Error']['Code'] == '404':
+            print(f'{key} does not exist.')
             return False
-        # Something went wrong, log it and return False
-        # TODO: logs
+        print(f'Error: {e}')
         return False
+    print(f'{key} already exists.')
     return True
 
 
