@@ -17,6 +17,7 @@ class NASABot(IBot):
             "NASA_INSTAGRAM_PASSWORD",
             shared_s3_bucket,
             "NASA_S3_PREFIX"
+            "#nasa #space #explore"
         )
         self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
 
