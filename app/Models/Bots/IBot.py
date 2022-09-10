@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from datetime import date
 from typing import Dict, Union, List
 
 import requests
@@ -48,12 +49,12 @@ class IBot:
             content = requests.get(picture.source, stream=True).content
             out_file.write(content)
 
-        key = f'{self.s3_prefix}/{picture.title}'
+        key = f'{self.s3_prefix}/{IBot.__date_string(picture.date)}-{picture.title}'
         extra_args = {
             'Metadata': {
                 'caption': picture.caption,
-                'date': picture.date.strftime("%m-%d-%Y"),
-                'source': picture.source
+                'source': picture.source,
+                'date': IBot.__date_string(picture.date)
             }
         }
         S3.upload_file(bucket=self.s3_bucket, key=key, location=picture.local, extra_args=extra_args)
@@ -67,6 +68,10 @@ class IBot:
 
         return caption
 
+    @staticmethod
+    def __date_string(date_: date) -> str:
+        return date_.strftime("%m-%d-%Y")
+
     def add_pic_to_instagram(self, picture: Picture) -> None:
         caption = self.__caption_string(picture)
 
@@ -75,7 +80,10 @@ class IBot:
         )
 
     def does_photo_exist(self, picture: Picture) -> bool:
-        return S3.does_file_exist(self.s3_bucket, f'{self.s3_prefix}/{picture.title}')
+        return S3.does_file_exist(
+            self.s3_bucket,
+            f'{self.s3_prefix}/{IBot.__date_string(picture.date)}-{picture.title}'
+        )
 
     def run(self) -> None:
         new_pic = self.find_new_pic()

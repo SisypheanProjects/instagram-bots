@@ -16,10 +16,12 @@ class NASABot(IBot):
             "NASA_INSTAGRAM_USERNAME",
             "NASA_INSTAGRAM_PASSWORD",
             shared_s3_bucket,
-            "NASA_S3_PREFIX"
-            "#nasa #space #explore"
+            "NASA_S3_PREFIX",
+            ["nasa", "space", "explore"]
         )
         self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
+
+        print('NASABot initialized.')
 
     def find_new_pic(self) -> Union[Picture, None]:
         # Request latest picture from NASA:
