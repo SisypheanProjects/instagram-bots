@@ -3,6 +3,7 @@ from datetime import date, datetime
 from typing import Dict, Union, List, Tuple
 
 import requests
+from instagrapi.exceptions import RateLimitError
 
 from APIs import DynamoDB
 from APIs.DynamoDB import Record
@@ -17,7 +18,7 @@ class IBot:
     __s3_prefix: str
     __dynamo_db_table: str
     __dynamo_db_topic: str
-    __insta_graph_api: InstaGraphAPI
+    __insta_graph_api: Union[InstaGraphAPI, None]
     __hashtags: List[str]
 
     def __init__(self,
@@ -42,7 +43,14 @@ class IBot:
 
         self.__hashtags = hashtags
 
-        self.__insta_graph_api = InstaGraphAPI(username=username, password=password)
+        try:
+            self.__insta_graph_api = InstaGraphAPI(username=username, password=password)
+        except RateLimitError:
+            print(f'Cannot instantiate InstaGraphiAPI for {username} due to RateLimitError.')
+            self.__insta_graph_api = None
+        except Exception as e:
+            print(f'Cannot instantiate InstaGraphAPI for {username}. Error: {e}')
+            self.__insta_graph_api = None
 
     @property
     def secret(self) -> Dict[str, str]: return self.__secret
@@ -103,6 +111,10 @@ class IBot:
         DynamoDB.add_record(self.__dynamo_db_table, record)
 
     def run(self) -> None:
+        if self.__insta_graph_api is None:
+            print('Cannot start Instagram Service.')
+            return
+
         record, new_pic = self.find_new_pic()
         if new_pic is not None:
             self.update_dynamodb(record)
