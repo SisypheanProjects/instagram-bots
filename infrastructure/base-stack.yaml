@@ -34,7 +34,7 @@ Resources:
                   "selection": {
                       "tagStatus": "untagged",
                       "countType": "imageCountMoreThan",
-                      "countNumber": 2
+                      "countNumber": 1
                   },
                   "action": {
                       "type": "expire"
@@ -49,6 +49,38 @@ Resources:
         - Key: Resource
           Value: ECR
   
+  InstagramBotServerlessFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-instagram-bot-serverless-function-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref InstagramBotVariousSecrets
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:PutObject
+                Resource:
+                  - !GetAtt InstagramBotSharedS3Bucket.Arn
+                  - !Sub ${InstagramBotSharedS3Bucket.Arn}/*
+
   InstagramBotServerlessFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -70,6 +102,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-serverless-function
       ImageUri: !Sub ${InstagramBotRepository.RepositoryUri}:latest
       PackageType: Image
+      Role: !GetAtt InstagramBotServerlessFunctionRole.Arn
       Tags:
         Stack: !Sub ${AWS::StackName}
         Resource: ECR
@@ -140,6 +173,75 @@ Resources:
       Description: Various Keys needed by the InstagramBot.
       Name: !Sub ${AWS::StackName}-user-various-secrets
       SecretString: '{}'
+      Tags:
+        - Key: Stack
+          Value: !Sub ${AWS::StackName}
+        - Key: Resource
+          Value: IAMUser
+
+  GitHubUserGroup:
+    Type: AWS::IAM::Group
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties: 
+      GroupName: InstagramBotsGitHubUserGroup
+      Policies: 
+        - PolicyName: !Sub ${AWS::StackName}-github-user-policy
+          PolicyDocument: 
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ecr:CompleteLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:InitiateLayerUpload
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                Resource: !GetAtt InstagramBotRepository.Arn
+              - Effect: Allow
+                Action:
+                  - lambda:UpdateFunctionCode
+                Resource: !GetAtt InstagramBotServerlessFunction.Arn
+  
+  GitHubUser:
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties: 
+      Groups: 
+        - !Ref GitHubUserGroup
+      Tags:
+        - Key: Stack
+          Value: !Sub ${AWS::StackName}
+        - Key: Resource
+          Value: IAMUser
+      UserName: !Sub ${AWS::StackName}-github-user
+
+  GitHubUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Status: Active
+      UserName: !Ref GitHubUser
+  
+  GitHubUserCredentialsSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: Access and Secret keys for the GitHub InstagramBot.
+      Name: !Sub ${AWS::StackName}-github-user-account-secrets
+      SecretString: !Sub |
+        '{
+          "USER_NAME":"${GitHubUser}",
+          "ACCESS_KEY":"${GitHubUserAccessKey}",
+          "SECRET_KEY":"${GitHubUserAccessKey.SecretAccessKey}"
+        }'
       Tags:
         - Key: Stack
           Value: !Sub ${AWS::StackName}

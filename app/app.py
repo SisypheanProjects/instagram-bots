@@ -18,6 +18,8 @@ bots: List[IBot] = [
 
 
 def handler(event, context):
+    print(event)
+    print(context)
     # TODO: Each bot might generate it's own config folder. Look into concurrency issues, and parallelize if safe.
     for bot in bots:
         bot.run()
