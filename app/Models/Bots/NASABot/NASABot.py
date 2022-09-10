@@ -1,4 +1,3 @@
-import ast
 from datetime import datetime
 from typing import Union
 
@@ -32,14 +31,14 @@ class NASABot(IBot):
         url = photo['hdurl']
         if not url:
             url = photo['url']
+
+        file_ext = url.split('.')[-1]
+        file = f'/tmp/{photo["title"]}.{file_ext}'
         date = datetime.strptime(photo['date'], '%Y-%m-%d')
-        picture = Picture(photo['title'], photo['explanation'], date, url)
+        picture = Picture(photo['title'], photo['explanation'], date, url, file)
 
         if self.does_photo_exist(picture):
             return
-
-        file_ext = url.split('.')[-1]
-        file = f'/tmp/{picture.title}.{file_ext}'
 
         with open(file, 'wb') as out_file:
             content = requests.get(picture.source, stream=True).content
@@ -57,5 +56,3 @@ class NASABot(IBot):
 
         return picture
 
-    def does_photo_exist(self, picture: Picture) -> bool:
-        return S3.does_file_exist(self.s3_bucket, f'{self.s3_prefix}/{picture.title}')

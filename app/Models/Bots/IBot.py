@@ -4,7 +4,7 @@ from typing import Dict, Union
 
 from instabot import Bot
 
-from AWS import SecretsManager
+from AWS import SecretsManager, S3
 from Models.Picture.Picture import Picture
 
 
@@ -34,11 +34,8 @@ class IBot:
         except FileNotFoundError:
             pass
 
-        # self.__bot = Bot()
-        # self.__bot.login(username=username, password=password)
-
-    @property
-    def bot(self) -> Bot: return self.__bot
+        self.__bot = Bot()
+        self.__bot.login(username=username, password=password)
 
     @property
     def secret(self) -> Dict[str, str]: return self.__secret
@@ -49,8 +46,14 @@ class IBot:
     @property
     def s3_prefix(self) -> str: return self.__s3_prefix
 
-    def add_pic_to_instagram(self, new_pic: Picture) -> None:
-        pass
+    def add_pic_to_instagram(self, photo: Picture) -> None:
+        caption = f'{photo.title}\n\nSource: {photo.source}'
+        self.__bot.upload_photo(
+            photo=photo.resize(), caption=caption,
+        )
+
+    def does_photo_exist(self, picture: Picture) -> bool:
+        return S3.does_file_exist(self.s3_bucket, f'{self.s3_prefix}/{picture.title}')
 
     def run(self) -> None:
         new_pic = self.add_picture_to_s3()
@@ -62,6 +65,4 @@ class IBot:
     def add_picture_to_s3(self) -> Union[Picture, None]:
         pass
 
-    @abstractmethod
-    def does_photo_exist(self, photo: Picture) -> bool:
-        pass
+

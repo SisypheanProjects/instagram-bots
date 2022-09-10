@@ -159,4 +159,6 @@ Outputs:
   InstagramBotVariousSecrets:
       Description: Various Keys needed by the InstagramBot.
       Value: !Ref InstagramBotVariousSecrets
-
+  InstagramSharedS3Bucket:
+      Description: Shared S3 bucket used by the InstagramBot.
+      Value: !Ref InstagramBotSharedS3Bucket
