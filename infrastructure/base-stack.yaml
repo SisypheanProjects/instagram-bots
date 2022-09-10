@@ -49,6 +49,36 @@ Resources:
         - Key: Resource
           Value: ECR
   
+  InstagramBotServerlessFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Sub ${AWS::StackName}-instagram-bot-serverless-function-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref InstagramBotVariousSecrets
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:PutObject
+                Resource:
+                  - !GetAtt InstagramBotSharedS3Bucket.Arn
+                  - !Sub ${InstagramBotSharedS3Bucket.Arn}/*
+
   InstagramBotServerlessFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -70,6 +100,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-serverless-function
       ImageUri: !Sub ${InstagramBotRepository.RepositoryUri}:latest
       PackageType: Image
+      Role: !GetAtt InstagramBotServerlessFunctionRole.Arn
       Tags:
         Stack: !Sub ${AWS::StackName}
         Resource: ECR

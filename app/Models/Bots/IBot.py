@@ -1,4 +1,3 @@
-import shutil
 from abc import abstractmethod
 from typing import Dict, Union
 
@@ -28,13 +27,10 @@ class IBot:
         self.__s3_bucket = s3_bucket
         self.__s3_prefix = self.__secret[s3_prefix]
 
-        # Needed to simplify local work
-        try:
-            shutil.rmtree('./config')
-        except FileNotFoundError:
-            pass
-
-        self.__bot = Bot()
+        self.__bot = Bot(
+            base_path="/tmp/",
+            log_filename="/tmp/log/instabot_{}.log".format(id(self))
+        )
         self.__bot.login(username=username, password=password)
 
     @property
@@ -64,5 +60,3 @@ class IBot:
     @abstractmethod
     def add_picture_to_s3(self) -> Union[Picture, None]:
         pass
-
-
