@@ -97,7 +97,7 @@ Resources:
             Description: Serverless Function trigger mechanism.
             Enabled: true
             Name: !Sub ${AWS::StackName}-serverless-function-event-trigger
-            Schedule: 'rate(1 hour)'
+            Schedule: 'rate(6 hours)'
           Type: Schedule
       FunctionName: !Sub ${AWS::StackName}-serverless-function
       ImageUri: !Sub ${InstagramBotRepository.RepositoryUri}:latest
