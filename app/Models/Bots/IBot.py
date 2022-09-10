@@ -1,6 +1,5 @@
-import datetime
 from abc import abstractmethod
-from datetime import date
+from datetime import date, datetime
 from typing import Dict, Union, List, Tuple
 
 import requests
@@ -86,7 +85,7 @@ class IBot:
         return DynamoDB.build_record(
             topic=self.__dynamo_db_topic,
             file=image_id,
-            date_added=datetime.datetime.fromtimestamp(date_added.datetime),
+            date_added=date_added,
             source=source
         )
 

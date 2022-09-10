@@ -18,7 +18,7 @@ except KeyError:
     DYNAMO_DB_TABLE = CloudFormation.get_stack_output("instagram-bots", "InstagramBotDynamoDBTable")
 
 bots: List[IBot] = [
-    NASABot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET, DYNAMO_DB_TABLE),
+    # NASABot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET, DYNAMO_DB_TABLE),
     EarthPicsBot(INSTAGRAM_SECRET_ARN, SHARED_S3_BUCKET, DYNAMO_DB_TABLE)
 ]
 

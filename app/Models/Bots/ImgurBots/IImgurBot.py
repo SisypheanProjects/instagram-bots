@@ -52,7 +52,7 @@ class IImgurBot(IBot):
         )
 
         for image in gallery:
-            record = self.build_record(image.id, image.datetime, image.link)
+            record = self.build_record(image.id, datetime.fromtimestamp(image.datetime), image.link)
 
             if self.does_photo_exist(record):
                 continue

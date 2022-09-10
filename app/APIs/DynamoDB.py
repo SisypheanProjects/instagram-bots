@@ -14,14 +14,8 @@ class _Column:
 class Record:
     __record: Dict[_Column, Dict[str, object]]
 
-    def __init__(self, topic: str, file: str, date_added: date, source: str):
+    def __init__(self, topic: str, file: str, date_added: datetime, source: str):
         date = datetime(*date_added.timetuple()[:6])
-        # self.__record = {
-        #     _Column.TOPIC: {'S': topic},
-        #     _Column.FILE: {'S': file},
-        #     _Column.DATE_ADDED: {'N': int((date - datetime(1970, 1, 1)).total_seconds())},
-        #     _Column.SOURCE: {'S': source}
-        # }
         self.__record = {
             _Column.TOPIC: topic,
             _Column.FILE: file,
