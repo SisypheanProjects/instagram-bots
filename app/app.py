@@ -25,5 +25,3 @@ def handler(event, context):
 
 if __name__ == '__main__':
     handler(None, None)
-
-# trigger build
