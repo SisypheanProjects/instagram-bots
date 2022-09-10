@@ -59,14 +59,14 @@ class IImgurBot(IBot):
 
             if DynamoDB.record_exists(self.__table, record):
                 continue
-            DynamoDB.add_record(record)
+            DynamoDB.add_record(self.__table, record)
             return IImgurBot.__build_picture(image)
 
         return self.find_new_pic(page + 1)
 
     @staticmethod
-    def __build_picture(image):
-        picture = Picture(
+    def __build_picture(image) -> Picture:
+        return Picture(
             title=image.title,
             caption='',
             date=datetime.fromtimestamp(image.datetime),
