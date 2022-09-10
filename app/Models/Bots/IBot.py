@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 import requests
 
@@ -12,14 +12,16 @@ class IBot:
     __secret: Dict[str, str]
     __s3_bucket: str
     __s3_prefix: str
-    __instagraph: InstaGraphAPI
+    __insta_graph_api: InstaGraphAPI
+    __hashtags: List[str]
 
     def __init__(self,
                  instagram_secret_arn: str,
                  instagram_user_key: str,
                  instagram_pass_key: str,
                  s3_bucket: str,
-                 s3_prefix: str):
+                 s3_prefix: str,
+                 hashtags: List[str]):
 
         self.__secret = SecretsManager.get_secret(instagram_secret_arn)
         username = self.__secret[instagram_user_key]
@@ -28,7 +30,9 @@ class IBot:
         self.__s3_bucket = s3_bucket
         self.__s3_prefix = self.__secret[s3_prefix]
 
-        self.__instagraph = InstaGraphAPI(username=username, password=password)
+        self.__hashtags = hashtags
+
+        self.__insta_graph_api = InstaGraphAPI(username=username, password=password)
 
     @property
     def secret(self) -> Dict[str, str]: return self.__secret
@@ -54,11 +58,20 @@ class IBot:
         }
         S3.upload_file(bucket=self.s3_bucket, key=key, location=picture.local, extra_args=extra_args)
 
-    def add_pic_to_instagram(self, photo: Picture) -> None:
-        caption = f'{photo.title}\n\nSource: {photo.source}\n\n{photo.caption}'
+    def __caption_string(self, picture: Picture) -> str:
+        caption = f'{picture.title}\n\n'
+        caption += f'Source: {picture.source}\n\n'
+        caption += f'{picture.caption}\n\n'
+        for tag in self.__hashtags:
+            caption += f'#{tag} '
 
-        self.__instagraph.photo_upload(
-            file_path=photo.resize(), caption=caption
+        return caption
+
+    def add_pic_to_instagram(self, picture: Picture) -> None:
+        caption = self.__caption_string(picture)
+
+        self.__insta_graph_api.photo_upload(
+            file_path=picture.resize(), caption=caption
         )
 
     def does_photo_exist(self, picture: Picture) -> bool:

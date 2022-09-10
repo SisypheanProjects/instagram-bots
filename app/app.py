@@ -20,8 +20,10 @@ bots: List[IBot] = [
 
 
 def handler(event, context):
-    print(event)
-    print(context)
+    if event is not None:
+        print(f'event: {event}')
+    if context is not None:
+        print(f'context: {context}')
 
     processes = []
     for bot in bots:
