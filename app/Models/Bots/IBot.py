@@ -4,14 +4,16 @@ from typing import Dict, Union
 from instabot import Bot
 
 from AWS import SecretsManager, S3
+from Models.Instagram.Instagram import InstaGraphAPI
 from Models.Picture.Picture import Picture
 
 
 class IBot:
-    __bot: Bot
+    # __bot: Bot
     __secret: Dict[str, str]
     __s3_bucket: str
     __s3_prefix: str
+    __instagraph: InstaGraphAPI
 
     def __init__(self,
                  instagram_secret_arn: str,
@@ -27,11 +29,12 @@ class IBot:
         self.__s3_bucket = s3_bucket
         self.__s3_prefix = self.__secret[s3_prefix]
 
-        self.__bot = Bot(
-            base_path="/tmp/",
-            log_filename="/tmp/log/instabot_{}.log".format(id(self))
-        )
-        self.__bot.login(username=username, password=password)
+        # self.__bot = Bot(
+        #     base_path="/tmp/",
+        #     log_filename="/tmp/log/instabot_{}.log".format(id(self))
+        # )
+        # self.__bot.login(username=username, password=password)
+        self.__instagraph = InstaGraphAPI(username=username, password=password)
 
     @property
     def secret(self) -> Dict[str, str]: return self.__secret
@@ -44,9 +47,13 @@ class IBot:
 
     def add_pic_to_instagram(self, photo: Picture) -> None:
         caption = f'{photo.title}\n\nSource: {photo.source}'
-        self.__bot.upload_photo(
-            photo=photo.resize(), caption=caption,
+
+        self.__instagraph.photo_upload(
+            file_path=photo.resize(), caption=caption
         )
+        # self.__bot.upload_photo(
+        #     photo=photo.resize(), caption=caption,
+        # )
 
     def does_photo_exist(self, picture: Picture) -> bool:
         return S3.does_file_exist(self.s3_bucket, f'{self.s3_prefix}/{picture.title}')
