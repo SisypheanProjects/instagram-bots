@@ -1,42 +1,52 @@
 from datetime import datetime
-from typing import Union
+from typing import Union, Tuple
 
+from APIs import NASA, DynamoDB
+from APIs.DynamoDB import Record
 from Models.Bots.IBot import IBot
 from Models.Picture.Picture import Picture
-from Utilities.Utilities import get
 
 
 class NASABot(IBot):
     __apod_api_key: str
 
-    def __init__(self, instagram_secret_arn: str, shared_s3_bucket: str):
+    def __init__(self, instagram_secret_arn: str, shared_s3_bucket: str, dynamo_db_table: str):
         # TODO: These strings should be in a config file
         super().__init__(
-            instagram_secret_arn,
-            "NASA_INSTAGRAM_USERNAME",
-            "NASA_INSTAGRAM_PASSWORD",
-            shared_s3_bucket,
-            "NASA_S3_PREFIX",
-            ["nasa", "space", "explore"]
+            instagram_secret_arn=instagram_secret_arn,
+            instagram_user_secret_key="NASA_INSTAGRAM_USERNAME",
+            instagram_pass_secret_key="NASA_INSTAGRAM_PASSWORD",
+            dynamo_db_table=dynamo_db_table,
+            dynamo_db_topic='nasa',
+            shared_s3_bucket=shared_s3_bucket,
+            s3_prefix="NASA_S3_PREFIX",
+            hashtags=["nasa", "space", "explore"]
         )
         self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
 
         print('NASABot initialized.')
 
-    def find_new_pic(self) -> Union[Picture, None]:
-        # Request latest picture from NASA:
-        url = f"https://api.nasa.gov/planetary/apod?api_key={self.__apod_api_key}"
-        photo = get(url)
+    def find_new_pic(self) -> Union[Tuple[Record, Picture], None]:
+        photo = NASA.apod_get(self.__apod_api_key)
 
         url = photo['hdurl']
         if not url:
             url = photo['url']
 
+        date = datetime.strptime(photo['date'], '%Y-%m-%d')
+
+        record = self.build_record(image_id=photo['title'], date_added=date, source=url)
+        if self.does_photo_exist(record):
+            return None
+
         file_ext = url.split('.')[-1]
         file = f'/tmp/{photo["title"]}.{file_ext}'
-        date = datetime.strptime(photo['date'], '%Y-%m-%d')
-        picture = Picture(photo['title'], photo['explanation'], date, url, file)
+        picture = Picture(
+            title=photo['title'],
+            caption=photo['explanation'],
+            date=date,
+            source=url,
+            local=file
+        )
 
-        if self.does_photo_exist(picture):
-            return None
-        return picture
+        return record, picture
