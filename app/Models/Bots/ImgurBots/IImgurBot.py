@@ -1,12 +1,15 @@
 from abc import ABC
 
+from imgurpython import ImgurClient
+
 from Models.Bots.IBot import IBot
 
 
 class IImgurBot(IBot, ABC):
     pass
 
-from imgurpython import ImgurClient
+
+
 
 client_id = 'YOUR CLIENT ID'
 client_secret = 'YOUR CLIENT SECRET'
