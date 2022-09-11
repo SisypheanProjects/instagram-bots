@@ -111,6 +111,7 @@ Resources:
           Type: Schedule
       FunctionName: !Sub ${AWS::StackName}-serverless-function
       ImageUri: !Sub ${InstagramBotRepository.RepositoryUri}:latest
+      MemorySize: 512
       PackageType: Image
       Role: !GetAtt InstagramBotServerlessFunctionRole.Arn
       Tags:
