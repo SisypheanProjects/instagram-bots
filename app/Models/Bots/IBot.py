@@ -13,6 +13,7 @@ from Models.Picture.Picture import Picture
 
 
 class IBot:
+    __bot_name: str
     __username: str
     __secret: Dict[str, str]
     __s3_bucket: str
@@ -23,6 +24,7 @@ class IBot:
     __hashtags: List[str]
 
     def __init__(self,
+                 bot_name: str,
                  instagram_secret_arn: str,
                  instagram_user_secret_key: str,
                  instagram_pass_secret_key: str,
@@ -32,6 +34,7 @@ class IBot:
                  s3_prefix: str,
                  hashtags: List[str]):
 
+        self.__bot_name = bot_name
         self.__secret = SecretsManager.get_secret(instagram_secret_arn)
         self.__username = self.__secret[instagram_user_secret_key]
         password = self.__secret[instagram_pass_secret_key]
@@ -47,11 +50,14 @@ class IBot:
         try:
             self.__insta_graph_api = InstaGraphAPI(username=self.__username, password=password)
         except RateLimitError:
-            print(f'Cannot instantiate InstaGraphiAPI for {self.__username} due to RateLimitError.')
+            print(f'{bot_name} -- Cannot instantiate InstaGraphiAPI for {self.__username} due to RateLimitError.')
             self.__insta_graph_api = None
         except Exception as e:
-            print(f'Cannot instantiate InstaGraphAPI for {self.__username}. Error: {e}')
+            print(f'{bot_name} -- Cannot instantiate InstaGraphAPI. Error: {e}')
             self.__insta_graph_api = None
+
+        if self.__insta_graph_api is not None:
+            print(f'{bot_name} -- Successfully initialized.')
 
     @property
     def secret(self) -> Dict[str, str]: return self.__secret
@@ -113,14 +119,19 @@ class IBot:
 
     def run(self) -> None:
         if self.__insta_graph_api is None:
-            print(f'Cannot start Instagram Service for {self.__username}.')
+            print(f'{self.__bot_name} -- Was not able to start Instagram Service. Exiting.')
             return
 
+        print(f'{self.__bot_name} -- searching for a new picture.')
         record, new_pic = self.find_new_pic()
         if new_pic is not None:
+            print(f'{self.__bot_name} -- uploading new picture to S3.')
             self.add_pic_to_s3(new_pic)
+            print(f'{self.__bot_name} -- adding new picture to Instagram.')
             self.add_pic_to_instagram(new_pic)
+            print(f'{self.__bot_name} -- updating DynamoDB.')
             self.update_dynamodb(record)
+            print(f'{self.__bot_name} -- complete.')
 
     @abstractmethod
     def find_new_pic(self) -> Union[Tuple[Record, Picture], None]:

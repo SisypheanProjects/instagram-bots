@@ -11,6 +11,7 @@ class NASABot(IBot):
     __apod_api_key: str
 
     def __init__(self,
+                 bot_name: str,
                  instagram_secret_arn: str,
                  dynamo_db_table: str,
                  shared_s3_bucket: str,
@@ -22,6 +23,7 @@ class NASABot(IBot):
 
         # TODO: These strings should be in a config file
         super().__init__(
+            bot_name=bot_name,
             instagram_secret_arn=instagram_secret_arn,
             instagram_user_secret_key=instagram_user_secret_key,
             instagram_pass_secret_key=instagram_pass_secret_key,
@@ -32,8 +34,6 @@ class NASABot(IBot):
             hashtags=hashtags
         )
         self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
-
-        print('NASABot initialized.')
 
     def find_new_pic(self) -> Union[Tuple[Record, Picture], None]:
         photo = NASA.apod_get(self.__apod_api_key)
