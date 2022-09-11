@@ -37,7 +37,8 @@ Bots:
       UserName: NASA_INSTAGRAM_USERNAME
       Password: NASA_INSTAGRAM_PASSWORD
       S3Prefix: NASA_S3_PREFIX
-    DynamoDBTopic: nasa
+      APODKey: NASA_APOD_API_KEY
+    DynamoDBTopic: nasa-pics
     HashTags:
       - nasa
       - space

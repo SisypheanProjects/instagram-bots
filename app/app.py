@@ -60,6 +60,7 @@ bots.append(NASABot(
     instagram_user_secret_key=nasa_bot_config['InstagramAccountSecretKeys']['UserName'],
     instagram_pass_secret_key=nasa_bot_config['InstagramAccountSecretKeys']['Password'],
     imgur_s3_prefix_secret_key=nasa_bot_config['InstagramAccountSecretKeys']['S3Prefix'],
+    nasa_apod_secret_key=nasa_bot_config['InstagramAccountSecretKeys']['APODKey'],
     hashtags=nasa_bot_config['HashTags']
 ))
 
