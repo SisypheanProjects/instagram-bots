@@ -119,7 +119,7 @@ class IBot:
 
     def run(self) -> None:
         if self.__insta_graph_api is None:
-            print(f'{self.__bot_name} - Was not able to start Instagram Service. Exiting.')
+            print(f'{self.__bot_name} -- Was not able to start Instagram Service. Exiting.')
             return
 
         print(f'{self.__bot_name} -- searching for a new picture.')
