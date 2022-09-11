@@ -3,7 +3,7 @@ from typing import Union, Tuple, List
 
 from APIs import NASA
 from AWS.DynamoDB import Record
-from AWS import S3, DynamoDB
+from AWS import DynamoDB
 from Models.Bots.IBot import IBot
 from Models.Picture.Picture import Picture
 
