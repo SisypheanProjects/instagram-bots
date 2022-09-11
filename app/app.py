@@ -35,6 +35,7 @@ for bot in config['Bots']['ImgurBots']:
     subreddit = bot['Subreddit']
 
     bots.append(ImgurBot(
+        bot_name=name,
         instagram_secret_arn=INSTAGRAM_SECRET_ARN,
         shared_s3_bucket=SHARED_S3_BUCKET,
         dynamo_db_table=DYNAMO_DB_TABLE,
@@ -48,6 +49,7 @@ for bot in config['Bots']['ImgurBots']:
 
 nasa_bot_config = config['Bots']['NASABot']
 bots.append(NASABot(
+    bot_name=nasa_bot_config['Name'],
     instagram_secret_arn=INSTAGRAM_SECRET_ARN,
     dynamo_db_table=DYNAMO_DB_TABLE,
     shared_s3_bucket=SHARED_S3_BUCKET,
