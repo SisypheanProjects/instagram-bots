@@ -131,8 +131,11 @@ class IBot:
                 return
 
         print(f'{self.__bot_name} -- searching for a new picture.')
-        record, new_pic = self.find_new_pic()
-        if new_pic is not None:
+        picture = self.find_new_pic()
+        if picture is not None:
+            # Unpack the tuple returned from find_new_pic:
+            (record, new_pic) = picture
+
             print(f'{self.__bot_name} -- uploading new picture to S3.')
             self.add_pic_to_s3(new_pic)
             if not self.__disable_instagram:
@@ -143,6 +146,8 @@ class IBot:
             print(f'{self.__bot_name} -- updating DynamoDB.')
             self.update_dynamodb(record)
             print(f'{self.__bot_name} -- complete.')
+        else:
+            print(f'{self.__bot_name} -- Could not find a new picture.')
 
     @abstractmethod
     def find_new_pic(self) -> Union[Tuple[Record, Picture], None]:

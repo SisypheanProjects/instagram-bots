@@ -4,7 +4,7 @@ StackOutputKeys:
   SecretARN: InstagramBotVariousSecrets
   SharedS3Bucket: InstagramBotSharedS3Bucket
   DynamoDBTable: InstagramBotDynamoDBTable
-DisableInstagram: False
+DisableInstagram: True
 Bots:
   ImgurBots:
     - Name: DogPicsBot
@@ -37,6 +37,7 @@ Bots:
       UserName: NASA_INSTAGRAM_USERNAME
       Password: NASA_INSTAGRAM_PASSWORD
       S3Prefix: NASA_S3_PREFIX
+      APODKey: NASA_APOD_API_KEY
     DynamoDBTopic: nasa
     HashTags:
       - nasa

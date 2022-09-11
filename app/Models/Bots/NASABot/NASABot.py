@@ -20,9 +20,9 @@ class NASABot(IBot):
                  instagram_user_secret_key: str,
                  instagram_pass_secret_key: str,
                  imgur_s3_prefix_secret_key: str,
+                 nasa_apod_secret_key: str,
                  hashtags: List[str]):
 
-        # TODO: These strings should be in a config file
         super().__init__(
             bot_name=bot_name,
             disable_instagram=disable_instagram,
@@ -35,10 +35,12 @@ class NASABot(IBot):
             s3_prefix=imgur_s3_prefix_secret_key,
             hashtags=hashtags
         )
-        self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
+        self.__apod_api_key = self.secret[nasa_apod_secret_key]
 
     def find_new_pic(self) -> Union[Tuple[Record, Picture], None]:
         photo = NASA.apod_get(self.__apod_api_key)
+        if photo is None:
+            return None
 
         url = photo['hdurl']
         if not url:
