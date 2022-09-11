@@ -4,6 +4,7 @@ StackOutputKeys:
   SecretARN: InstagramBotVariousSecrets
   SharedS3Bucket: InstagramBotSharedS3Bucket
   DynamoDBTable: InstagramBotDynamoDBTable
+DisableInstagram: False
 Bots:
   ImgurBots:
     - Name: DogPicsBot

@@ -12,6 +12,7 @@ class NASABot(IBot):
 
     def __init__(self,
                  bot_name: str,
+                 disable_instagram: bool,
                  instagram_secret_arn: str,
                  dynamo_db_table: str,
                  shared_s3_bucket: str,
@@ -24,6 +25,7 @@ class NASABot(IBot):
         # TODO: These strings should be in a config file
         super().__init__(
             bot_name=bot_name,
+            disable_instagram=disable_instagram,
             instagram_secret_arn=instagram_secret_arn,
             instagram_user_secret_key=instagram_user_secret_key,
             instagram_pass_secret_key=instagram_pass_secret_key,
