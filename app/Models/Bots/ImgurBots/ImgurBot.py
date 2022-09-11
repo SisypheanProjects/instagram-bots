@@ -66,7 +66,7 @@ class ImgurBot(IBot):
 
     @staticmethod
     def __build_picture(image) -> Picture:
-        local = f'/tmp/{image.title}'
+        local = f"/tmp/{''.join(ch for ch in image.title if ch.isalnum())}"
         return Picture(
             title=image.title,
             caption='',
