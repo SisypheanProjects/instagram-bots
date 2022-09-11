@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 from APIs import NASA, DynamoDB
 from APIs.DynamoDB import Record
@@ -10,17 +10,26 @@ from Models.Picture.Picture import Picture
 class NASABot(IBot):
     __apod_api_key: str
 
-    def __init__(self, instagram_secret_arn: str, shared_s3_bucket: str, dynamo_db_table: str):
+    def __init__(self,
+                 instagram_secret_arn: str,
+                 dynamo_db_table: str,
+                 shared_s3_bucket: str,
+                 dynamo_db_topic: str,
+                 instagram_user_secret_key: str,
+                 instagram_pass_secret_key: str,
+                 imgur_s3_prefix_secret_key: str,
+                 hashtags: List[str]):
+
         # TODO: These strings should be in a config file
         super().__init__(
             instagram_secret_arn=instagram_secret_arn,
-            instagram_user_secret_key="NASA_INSTAGRAM_USERNAME",
-            instagram_pass_secret_key="NASA_INSTAGRAM_PASSWORD",
+            instagram_user_secret_key=instagram_user_secret_key,
+            instagram_pass_secret_key=instagram_pass_secret_key,
             dynamo_db_table=dynamo_db_table,
-            dynamo_db_topic='nasa',
+            dynamo_db_topic=dynamo_db_topic,
             shared_s3_bucket=shared_s3_bucket,
-            s3_prefix="NASA_S3_PREFIX",
-            hashtags=["nasa", "space", "explore"]
+            s3_prefix=imgur_s3_prefix_secret_key,
+            hashtags=hashtags
         )
         self.__apod_api_key = self.secret["NASA_APOD_API_KEY"]
 
