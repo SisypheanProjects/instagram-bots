@@ -1,42 +1,43 @@
 ---
 StackName: instagram-bots
 StackOutputKeys:
-  - SecretARN: InstagramBotVariousSecrets
-  - SharedS3Bucket: InstagramBotSharedS3Bucket
-  - DynamoDBTable: InstagramBotDynamoDBTable
+  SecretARN: InstagramBotVariousSecrets
+  SharedS3Bucket: InstagramBotSharedS3Bucket
+  DynamoDBTable: InstagramBotDynamoDBTable
 Bots:
-  - ImgurBots:
-    - DogPicsBot:
-        - DynamoDBTopic: dog-pics
-        - InstagramAccountSecretKeys:
-          - UserName: DOGPICS_INSTAGRAM_USERNAME
-          - Password: DOGPICS_INSTAGRAM_PASSWORD
-          - S3Prefix: DOGPICS_S3_PREFIX
-        - HashTags:
-            - dog
-            - pet
-            - reddit
-            - imgur
-        - Subreddit: rarepuppers
-    - EarthPicsBot:
-        - DynamoDBTopic: earth-pics
-        - InstagramAccountSecretKeys:
-          - UserName: EARTHPICS_INSTAGRAM_USERNAME
-          - Password: EARTHPICS_INSTAGRAM_PASSWORD
-          - S3Prefix: EARTHPICS_S3_PREFIX
-        - HashTags:
-            - earth
-            - earthpics
-            - reddit
-            - imgur
-        - Subreddit: EarthPorn
-  - NASABot:
-      - InstagramAccountSecretKeys:
-        - UserName: NASA_INSTAGRAM_USERNAME
-        - Password: NASA_INSTAGRAM_PASSWORD
-        - S3Prefix: NASA_S3_PREFIX
-      - DynamoDBTopic: nasa
-      - HashTags:
-          - nasa
-          - space
-          - explore
+  ImgurBots:
+    - Name: DogPicsBot
+      DynamoDBTopic: dog-pics
+      HashTags:
+        - dog
+        - pet
+        - reddit
+        - imgur
+      InstagramAccountSecretKeys:
+        UserName: DOGPICS_INSTAGRAM_USERNAME
+        Password: DOGPICS_INSTAGRAM_PASSWORD
+        S3Prefix: DOGPICS_S3_PREFIX
+      Subreddit: rarepuppers
+    - Name: EarthPicsBot
+      DynamoDBTopic: earth-pics
+      HashTags:
+        - earth
+        - earthpics
+        - reddit
+        - imgur
+      InstagramAccountSecretKeys:
+        UserName: EARTHPICS_INSTAGRAM_USERNAME
+        Password: EARTHPICS_INSTAGRAM_PASSWORD
+        S3Prefix: EARTHPICS_S3_PREFIX
+      Subreddit: EarthPorn
+  NASABot:
+    Name: NASABot
+    InstagramAccountSecretKeys:
+      UserName: NASA_INSTAGRAM_USERNAME
+      Password: NASA_INSTAGRAM_PASSWORD
+      S3Prefix: NASA_S3_PREFIX
+    DynamoDBTopic: nasa
+    HashTags:
+      - nasa
+      - space
+      - explore
