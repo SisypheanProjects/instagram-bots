@@ -40,6 +40,8 @@ class Picture:
 
     def resize(self) -> str:
         img = Image.open(self.local)
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
         new_dimensions = Picture.__new_dimensions(img.height, img.width)
         img_resized = img.resize(new_dimensions)
 

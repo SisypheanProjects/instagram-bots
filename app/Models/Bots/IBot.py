@@ -118,9 +118,9 @@ class IBot:
 
         record, new_pic = self.find_new_pic()
         if new_pic is not None:
-            self.update_dynamodb(record)
             self.add_pic_to_s3(new_pic)
             self.add_pic_to_instagram(new_pic)
+            self.update_dynamodb(record)
 
     @abstractmethod
     def find_new_pic(self) -> Union[Tuple[Record, Picture], None]:
