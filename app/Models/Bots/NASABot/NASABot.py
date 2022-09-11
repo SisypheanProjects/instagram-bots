@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Union, Tuple
 
 from APIs import NASA, DynamoDB
@@ -36,8 +36,10 @@ class NASABot(IBot):
         date = datetime.strptime(photo['date'], '%Y-%m-%d')
 
         record = self.build_record(image_id=photo['title'], date_added=date, source=url)
-        if self.does_photo_exist(record):
-            return None
+        while not self.does_photo_exist(record):
+            date = date - timedelta(days=1)
+            photo = NASA.apod_get(self.__apod_api_key, date)
+            record = self.build_record(image_id=photo['title'], date_added=date, source=url)
 
         file_ext = url.split('.')[-1]
         file = f'/tmp/{photo["title"]}.{file_ext}'
