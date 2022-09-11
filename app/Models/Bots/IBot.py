@@ -5,9 +5,8 @@ from typing import Dict, Union, List, Tuple
 import requests
 from instagrapi.exceptions import RateLimitError
 
-from APIs import DynamoDB
-from APIs.DynamoDB import Record
-from AWS import SecretsManager, S3
+from AWS.DynamoDB import Record
+from AWS import SecretsManager, S3, DynamoDB
 from Models.Instagram.Instagram import InstaGraphAPI
 from Models.Picture.Picture import Picture
 
@@ -74,6 +73,12 @@ class IBot:
 
     @property
     def s3_prefix(self) -> str: return self.__s3_prefix
+
+    @property
+    def dynamodb_table(self) -> str: return self.__dynamo_db_table
+
+    @property
+    def dynamodb_topic(self) -> str: return self.__dynamo_db_topic
 
     def add_pic_to_s3(self, picture: Picture) -> None:
         with open(picture.local, 'wb') as out_file:

@@ -29,6 +29,3 @@ def apod_get(api_key: str, date: Union[datetime, None] = None) -> Union[Dict, No
     except HTTPError as e:
         print(f'Could not get a new picture. Error: {e}')
         return None
-
-
-nasa = nasapy

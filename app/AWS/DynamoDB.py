@@ -1,7 +1,8 @@
 from datetime import date, datetime
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 import boto3
+from boto3.dynamodb.conditions import Key
 
 
 class _Column:
@@ -54,3 +55,14 @@ def record_exists(table: str, record: Record) -> bool:
         }
     )
     return 'Item' in result.keys()
+
+
+def pull_partition(table: str, partition_key: str) -> List[Dict]:
+    dynamo_table = __client.Table(table)
+    response = dynamo_table.query(
+        KeyConditionExpression=(
+            Key('topic').eq(partition_key)
+        )
+    )['Items']
+
+    return sorted(response, key=lambda x: x['date-added'])

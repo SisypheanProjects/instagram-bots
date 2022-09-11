@@ -3,7 +3,7 @@ from typing import Union, List, Tuple
 
 from imgurpython import ImgurClient
 
-from APIs.DynamoDB import Record
+from AWS.DynamoDB import Record
 from Models.Bots.IBot import IBot
 from Models.Picture.Picture import Picture
 
