@@ -14,6 +14,7 @@ stream = open("config.yaml", 'r')
 config = yaml.load(stream, Loader=Loader)
 stack_name = config['StackName']
 stack_output_keys = config['StackOutputKeys']
+disable_instagram = config['DisableInstagram']
 
 try:
     INSTAGRAM_SECRET_ARN = os.environ["INSTAGRAM_SECRET_ARN"]
@@ -36,6 +37,7 @@ for bot in config['Bots']['ImgurBots']:
 
     bots.append(ImgurBot(
         bot_name=name,
+        disable_instagram=disable_instagram,
         instagram_secret_arn=INSTAGRAM_SECRET_ARN,
         shared_s3_bucket=SHARED_S3_BUCKET,
         dynamo_db_table=DYNAMO_DB_TABLE,
@@ -50,6 +52,7 @@ for bot in config['Bots']['ImgurBots']:
 nasa_bot_config = config['Bots']['NASABot']
 bots.append(NASABot(
     bot_name=nasa_bot_config['Name'],
+    disable_instagram=disable_instagram,
     instagram_secret_arn=INSTAGRAM_SECRET_ARN,
     dynamo_db_table=DYNAMO_DB_TABLE,
     shared_s3_bucket=SHARED_S3_BUCKET,

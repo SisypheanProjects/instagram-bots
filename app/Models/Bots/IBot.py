@@ -20,11 +20,13 @@ class IBot:
     __s3_prefix: str
     __dynamo_db_table: str
     __dynamo_db_topic: str
+    __disable_instagram: bool
     __insta_graph_api: Union[InstaGraphAPI, None]
     __hashtags: List[str]
 
     def __init__(self,
                  bot_name: str,
+                 disable_instagram: bool,
                  instagram_secret_arn: str,
                  instagram_user_secret_key: str,
                  instagram_pass_secret_key: str,
@@ -35,6 +37,7 @@ class IBot:
                  hashtags: List[str]):
 
         self.__bot_name = bot_name
+        self.__disable_instagram = disable_instagram
         self.__secret = SecretsManager.get_secret(instagram_secret_arn)
         self.__username = self.__secret[instagram_user_secret_key]
         password = self.__secret[instagram_pass_secret_key]
@@ -47,17 +50,21 @@ class IBot:
 
         self.__hashtags = hashtags
 
-        try:
-            self.__insta_graph_api = InstaGraphAPI(username=self.__username, password=password)
-        except RateLimitError:
-            print(f'{bot_name} -- Cannot instantiate InstaGraphiAPI for {self.__username} due to RateLimitError.')
-            self.__insta_graph_api = None
-        except Exception as e:
-            print(f'{bot_name} -- Cannot instantiate InstaGraphAPI. Error: {e}')
-            self.__insta_graph_api = None
+        if not disable_instagram:
+            try:
+                self.__insta_graph_api = InstaGraphAPI(username=self.__username, password=password)
+            except RateLimitError:
+                print(f'{bot_name} -- Cannot instantiate InstaGraphiAPI for {self.__username} due to RateLimitError.')
+                self.__insta_graph_api = None
+            except Exception as e:
+                print(f'{bot_name} -- Cannot instantiate InstaGraphAPI. Error: {e}')
+                self.__insta_graph_api = None
 
-        if self.__insta_graph_api is not None:
-            print(f'{bot_name} -- Successfully initialized.')
+            if self.__insta_graph_api is not None:
+                print(f'{bot_name} -- Successfully initialized.')
+        else:
+            self.__insta_graph_api = None
+            print(f'{bot_name} -- Disable Instagram flag is present in config. Not initializing InstaGraphAPI.')
 
     @property
     def secret(self) -> Dict[str, str]: return self.__secret
@@ -118,17 +125,21 @@ class IBot:
         DynamoDB.add_record(self.__dynamo_db_table, record)
 
     def run(self) -> None:
-        if self.__insta_graph_api is None:
-            print(f'{self.__bot_name} -- Was not able to start Instagram Service. Exiting.')
-            return
+        if not self.__disable_instagram:
+            if self.__insta_graph_api is None:
+                print(f'{self.__bot_name} -- Was not able to start Instagram Service. Exiting.')
+                return
 
         print(f'{self.__bot_name} -- searching for a new picture.')
         record, new_pic = self.find_new_pic()
         if new_pic is not None:
             print(f'{self.__bot_name} -- uploading new picture to S3.')
             self.add_pic_to_s3(new_pic)
-            print(f'{self.__bot_name} -- adding new picture to Instagram.')
-            self.add_pic_to_instagram(new_pic)
+            if not self.__disable_instagram:
+                print(f'{self.__bot_name} -- adding new picture to Instagram.')
+                self.add_pic_to_instagram(new_pic)
+            else:
+                print(f'{self.__bot_name} -- Disable Instagram flag is present in config. Will not attempt to update Instagram.')
             print(f'{self.__bot_name} -- updating DynamoDB.')
             self.update_dynamodb(record)
             print(f'{self.__bot_name} -- complete.')
