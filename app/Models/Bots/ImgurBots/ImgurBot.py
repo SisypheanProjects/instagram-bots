@@ -8,7 +8,7 @@ from Models.Bots.IBot import IBot
 from Models.Picture.Picture import Picture
 
 
-class IImgurBot(IBot):
+class ImgurBot(IBot):
 
     __client: ImgurClient
     __subreddit: str
@@ -57,7 +57,7 @@ class IImgurBot(IBot):
             if self.does_photo_exist(record):
                 continue
 
-            return record, IImgurBot.__build_picture(image)
+            return record, ImgurBot.__build_picture(image)
         return self.find_new_pic(page + 1)
 
     @staticmethod
