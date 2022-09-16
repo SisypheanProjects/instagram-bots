@@ -88,7 +88,7 @@ class IBot:
         key = f'{self.s3_prefix}/{IBot.__date_string(picture.date)}-{picture.title}'
         extra_args = {
             'Metadata': {
-                'caption': picture.caption,
+                'caption': "".join(c for c in picture.caption if ord(c) < 128),
                 'source': picture.source,
                 'date': IBot.__date_string(picture.date)
             }
