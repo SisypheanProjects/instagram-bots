@@ -45,13 +45,13 @@ class NASABot(IBot):
         if len(dates) == 0:
             return None
 
-        latest_image = datetime.fromtimestamp(dates[-1]).strftime('%Y-%m-%d')
-        today = datetime.today().strftime('%Y-%m-%d')
+        latest_image = datetime.utcfromtimestamp(dates[-1]).strftime('%Y-%m-%d')
+        today = datetime.utcnow().strftime('%Y-%m-%d')
 
         if latest_image != today and not skip_today:
             return None
 
-        return datetime.fromtimestamp(dates[0]) - timedelta(days=1)
+        return datetime.utcfromtimestamp(dates[0]) - timedelta(days=1)
 
     def find_new_pic(self) -> Union[Tuple[Record, Picture], None]:
         seen_images = DynamoDB.pull_partition(self.dynamodb_table, self.dynamodb_topic)
