@@ -54,8 +54,9 @@ class ImgurBot(IBot):
         )
 
         for image in gallery:
-            if image.type != 'image/jpeg':
+            if image.in_gallery or image.type != 'image/jpeg':
                 continue
+
             record = self.build_record(image.id, datetime.fromtimestamp(image.datetime), image.link)
 
             if self.does_photo_exist(record):
