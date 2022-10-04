@@ -146,10 +146,11 @@ class IBot:
             if not self.__disable_instagram:
                 print(f'{self.__bot_name} -- adding new picture to Instagram.')
                 self.add_pic_to_instagram(new_pic)
+                print(f'{self.__bot_name} -- updating DynamoDB.')
+                self.update_dynamodb(record)
             else:
                 print(f'{self.__bot_name} -- Disable Instagram flag is present in config. Will not attempt to update Instagram.')
-            print(f'{self.__bot_name} -- updating DynamoDB.')
-            self.update_dynamodb(record)
+                print(f'{self.__bot_name} -- Disable Instagram flag is present in config. Will not attempt to update Dynamodb.')
             print(f'{self.__bot_name} -- complete.')
         else:
             print(f'{self.__bot_name} -- Could not find a new picture.')
