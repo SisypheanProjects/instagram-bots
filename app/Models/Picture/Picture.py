@@ -36,7 +36,7 @@ class Picture:
 
     @property
     def local(self) -> str:
-        return self.__local
+        return f'/tmp/{self.__local.replace("/", "")}'
 
     def resize(self) -> str:
         img = Image.open(self.local)
@@ -45,7 +45,7 @@ class Picture:
         new_dimensions = Picture.__new_dimensions(img.height, img.width)
         img_resized = img.resize(new_dimensions)
 
-        resized = f'/tmp/{self.title}_resized.jpg'
+        resized = f'{self.local}_resized.jpg'
         img_resized.save(resized)
 
         return resized
