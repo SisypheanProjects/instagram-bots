@@ -95,7 +95,7 @@ class NASABot(IBot):
             return None
 
         file_ext = url.split('.')[-1]
-        file = f'/tmp/{photo["title"]}.{file_ext}'
+        file = f'{photo["title"]}.{file_ext}'
         picture = Picture(
             title=photo['title'],
             caption=photo['explanation'],
