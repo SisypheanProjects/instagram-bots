@@ -22,6 +22,8 @@ class NASABot(IBot):
                  instagram_pass_secret_key: str,
                  imgur_s3_prefix_secret_key: str,
                  nasa_apod_secret_key: str,
+                 challenge_email_key: str,
+                 challenge_pass_key: str,
                  hashtags: List[str]):
 
         super().__init__(
@@ -30,6 +32,8 @@ class NASABot(IBot):
             instagram_secret_arn=instagram_secret_arn,
             instagram_user_secret_key=instagram_user_secret_key,
             instagram_pass_secret_key=instagram_pass_secret_key,
+            challenge_email_key=challenge_email_key,
+            challenge_pass_key=challenge_pass_key,
             dynamo_db_table=dynamo_db_table,
             dynamo_db_topic=dynamo_db_topic,
             shared_s3_bucket=shared_s3_bucket,

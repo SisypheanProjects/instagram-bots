@@ -29,6 +29,8 @@ class IBot:
                  instagram_secret_arn: str,
                  instagram_user_secret_key: str,
                  instagram_pass_secret_key: str,
+                 challenge_email_key: str,
+                 challenge_pass_key: str,
                  dynamo_db_table: str,
                  dynamo_db_topic: str,
                  shared_s3_bucket: str,
@@ -41,6 +43,9 @@ class IBot:
         self.__username = self.__secret[instagram_user_secret_key]
         password = self.__secret[instagram_pass_secret_key]
 
+        challenge_email = self.__secret[challenge_email_key]
+        challenge_pass = self.__secret[challenge_email_key]
+
         self.__s3_bucket = shared_s3_bucket
         self.__s3_prefix = self.__secret[s3_prefix]
 
@@ -51,7 +56,12 @@ class IBot:
 
         if not disable_instagram:
             try:
-                self.__insta_graph_api = InstaGraphAPI(username=self.__username, password=password)
+                self.__insta_graph_api = InstaGraphAPI(
+                    username=self.__username,
+                    password=password,
+                    challenge_email=challenge_email,
+                    challenge_pass=challenge_pass
+                )
             except RateLimitError:
                 print(f'{bot_name} -- Cannot instantiate InstaGraphiAPI for {self.__username} due to RateLimitError.')
                 self.__insta_graph_api = None

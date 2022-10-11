@@ -28,26 +28,26 @@ except KeyError:
 
 bots: List[IBot] = []
 
-for bot in config['Bots']['ImgurBots']:
-    name = bot['Name']
-    dynamo_topic = bot['DynamoDBTopic']
-    instagram_secret_keys = bot['InstagramAccountSecretKeys']
-    hashtags = bot['HashTags']
-    subreddit = bot['Subreddit']
-
-    bots.append(ImgurBot(
-        bot_name=name,
-        disable_instagram=disable_instagram,
-        instagram_secret_arn=INSTAGRAM_SECRET_ARN,
-        shared_s3_bucket=SHARED_S3_BUCKET,
-        dynamo_db_table=DYNAMO_DB_TABLE,
-        dynamo_db_topic=dynamo_topic,
-        subreddit=subreddit,
-        instagram_user_secret_key=instagram_secret_keys['UserName'],
-        instagram_pass_secret_key=instagram_secret_keys['Password'],
-        imgur_s3_prefix_secret_key=instagram_secret_keys['S3Prefix'],
-        hashtags=hashtags
-    ))
+# for bot in config['Bots']['ImgurBots']:
+#     name = bot['Name']
+#     dynamo_topic = bot['DynamoDBTopic']
+#     instagram_secret_keys = bot['InstagramAccountSecretKeys']
+#     hashtags = bot['HashTags']
+#     subreddit = bot['Subreddit']
+#
+#     bots.append(ImgurBot(
+#         bot_name=name,
+#         disable_instagram=disable_instagram,
+#         instagram_secret_arn=INSTAGRAM_SECRET_ARN,
+#         shared_s3_bucket=SHARED_S3_BUCKET,
+#         dynamo_db_table=DYNAMO_DB_TABLE,
+#         dynamo_db_topic=dynamo_topic,
+#         subreddit=subreddit,
+#         instagram_user_secret_key=instagram_secret_keys['UserName'],
+#         instagram_pass_secret_key=instagram_secret_keys['Password'],
+#         imgur_s3_prefix_secret_key=instagram_secret_keys['S3Prefix'],
+#         hashtags=hashtags
+#     ))
 
 nasa_bot_config = config['Bots']['NASABot']
 bots.append(NASABot(
@@ -61,6 +61,8 @@ bots.append(NASABot(
     instagram_pass_secret_key=nasa_bot_config['InstagramAccountSecretKeys']['Password'],
     imgur_s3_prefix_secret_key=nasa_bot_config['InstagramAccountSecretKeys']['S3Prefix'],
     nasa_apod_secret_key=nasa_bot_config['InstagramAccountSecretKeys']['APODKey'],
+    challenge_email_key=nasa_bot_config['InstagramAccountSecretKeys']['ChallengeEmail'],
+    challenge_pass_key=nasa_bot_config['InstagramAccountSecretKeys']['ChallengePass'],
     hashtags=nasa_bot_config['HashTags']
 ))
 

@@ -18,6 +18,8 @@ Bots:
         UserName: DOGPICS_INSTAGRAM_USERNAME
         Password: DOGPICS_INSTAGRAM_PASSWORD
         S3Prefix: DOGPICS_S3_PREFIX
+        ChallengeEmail: DOGPICS_CHALLENGE_EMAIL
+        ChallengePass: DOGPICS_CHALLENGE_PASS
       Subreddit: rarepuppers
     - Name: EarthPicsBot
       DynamoDBTopic: earth-pics
@@ -30,6 +32,8 @@ Bots:
         UserName: EARTHPICS_INSTAGRAM_USERNAME
         Password: EARTHPICS_INSTAGRAM_PASSWORD
         S3Prefix: EARTHPICS_S3_PREFIX
+        ChallengeEmail: EARTHPICS_CHALLENGE_EMAIL
+        ChallengePass: EARTHPICS_CHALLENGE_PASS
       Subreddit: EarthPorn
   NASABot:
     Name: NASABot
@@ -38,6 +42,8 @@ Bots:
       Password: NASA_INSTAGRAM_PASSWORD
       S3Prefix: NASA_S3_PREFIX
       APODKey: NASA_APOD_API_KEY
+      ChallengeEmail: NASA_CHALLENGE_EMAIL
+      ChallengePass: NASA_CHALLENGE_PASS
     DynamoDBTopic: nasa-pics
     HashTags:
       - nasa
